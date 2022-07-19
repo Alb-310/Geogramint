@@ -1,0 +1,15 @@
+#:import MapView kivy_garden.mapview.MapView
+#:import MarkerCenter mapfiles.markercenter.MarkerCenter
+#:import Map mapfiles.map.Map
+#:include mapfiles/markercenter.kv
+
+<Map>:
+    lat: 45.45250329381673
+    lon: -86.4436232218779
+    zoom: 10
+    on_zoom:
+        self.zoom = 3 if self.zoom < 2 else self.zoom
+    MarkerCenter:
+        lat: root.lat
+        lon: root.lon
+        id: mark

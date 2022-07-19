@@ -1,0 +1,6 @@
+telethon
+trio
+kivy
+kivymd
+kivy-garden
+mapview

@@ -1,0 +1,68 @@
+#:include mapfiles/map.kv
+
+
+MDBoxLayout:
+    MDBoxLayout:
+        MDBoxLayout:
+            MDFloatLayout:
+                spacing: 100
+                MDRaisedButton:
+                    id: Start
+                    text: "[b]Start Search[/b]"
+                    md_bg_color: 0, 0.4, 1, 0.9
+                    pos_hint:{'center_y': 0.95, 'center_x': 0.5}
+                MDLabel:
+                    text: "Users"
+                    font_size: "28sp"
+                    font_name: "appfiles/Teko-SemiBold.ttf"
+                    pos_hint:{'center_y': 0.88, 'center_x': 0.88}
+                ScrollView:
+                    do_scroll_x: False
+                    do_scroll_y: True
+                    pos_hint:{'center_y': 0.35}
+                    scroll_distance: 100
+                    MDList:
+                        id: usersList
+                        size: self.size
+
+                MDFillRoundFlatIconButton:
+                    id: settings
+                    text: " "
+                    icon: ""
+                    pos_hint:{'bottom': 1, 'left': 1}
+                    md_bg_color: 0.9, 0.9, 0.9, 0.8
+                    Image:
+                        source: 'appfiles/settings.png'
+                        y: self.parent.y
+                        x: self.parent.x
+        MDBoxLayout:
+            MDFloatLayout:
+                MDRaisedButton:
+                    id: Reset
+                    text: "[b]Reset[/b]"
+                    md_bg_color: 0.95, 0.2, 0.2, 0.9
+                    pos_hint:{'center_y': 0.95, 'center_x': 0.5}
+                MDLabel:
+                    text: "Groups"
+                    font_size: "28sp"
+                    font_name: "appfiles/Teko-SemiBold.ttf"
+                    pos_hint:{'center_y': 0.88, 'center_x': 0.88}
+                ScrollView:
+                    do_scroll_x: False
+                    do_scroll_y: True
+                    pos_hint:{'center_y': 0.35, 'center_x': 0.5}
+                    scroll_distance: 100
+                    MDList:
+                        id: groupsList
+
+    MDFloatLayout:
+        Map:
+            id: mapview
+            pos_hint: {'right': 1}
+        MDTextField:
+            id: searchInput
+            size_hint: 0.3, None
+            pos_hint: {'top': 1,'right': 1}
+            helper_text_mode: "on_error"
+            helper_text: "Wrong format"
+            hint_text: "Coordinates"
