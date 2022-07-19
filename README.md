@@ -1,10 +1,10 @@
 # **Geogramint - OSINT Geolocalization tool for Telegram**
 <p align="center">
-<img src="https://github.com/Alb-310/Geogramint/blob/main/appfiles/Geogramint.png" width="300"/>
+<img src="https://github.com/Alb-310/Geogramint/blob/master/appfiles/Geogramint.png" width="300"/>
 </p>
 
-<p align="center"> <img src="https://img.shields.io/badge/version-1.0-orange" /> <img src="http://ForTheBadge.com/images/badges/made-with-python.svg"/> <a href="https://github.com/Alb-310"> <img alt="GitHub" src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white"/><a/> <a href="https://twitter.com/Alb_310"> <img src="https://github.com/Alb-310/Geogramint/blob/main/.github/by-alb310.svg"/><a/> <img src="https://img.shields.io/badge/License-GPLv3-blue.svg"/>
-<p align="center"> <a href="https://projetfox.com/"> <img src="https://github.com/Alb-310/Geogramint/blob/main/.github/fox%20badge.png" width="200"/> <a/>
+<p align="center"> <img src="https://img.shields.io/badge/version-1.0-orange" /> <img src="http://ForTheBadge.com/images/badges/made-with-python.svg"/> <a href="https://github.com/Alb-310"> <img alt="GitHub" src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white"/><a/> <a href="https://twitter.com/Alb_310"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/by-alb310.svg"/><a/> <img src="https://img.shields.io/badge/License-GPLv3-blue.svg"/>
+<p align="center"> <a href="https://projetfox.com/"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/fox%20badge.png" width="200"/> <a/>
 
 ## **About**
 
@@ -14,7 +14,7 @@ Geogramint only finds Telegram users and groups which have activated the nearby 
 
 The tool is fully supported on Windows and partially supported on Mac OS and Linux distributions.
 
-<p align="center"> <img src="https://github.com/Alb-310/Geogramint/blob/main/.github/Geogramint_image.png" />
+<p align="center"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/Geogramint_image.png" />
 
 ## 🛠️ Installation
 
@@ -65,20 +65,20 @@ More details in the Wiki.
 
 1. Start by creating an API key for your Telegram account [here](https://my.telegram.org). You will also need to put a profile picture on your account and, in your `Privacy and Security` settings, enable the profile picture for everyone.
 
-<p align="center"> <img src="https://github.com/Alb-310/Geogramint/blob/main/.github/privacy_settings.jpg" width="300"/>
+<p align="center"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/privacy_settings.jpg" width="300"/>
 
 2. Launch **Geogramint**
 3. In the settings, write your information (api_id, api_hash and phone number) and then `save`
 
-<p align="center"> <img src="https://github.com/Alb-310/Geogramint/blob/main/.github/Geogramint_settings_1.png" width="500"/> <img src="https://github.com/Alb-310/Geogramint/blob/main/.github/Geogramint_settings_2.png" width="500"/>
+<p align="center"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/Geogramint_settings_1.png" width="500"/> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/Geogramint_settings_2.png" width="500"/>
 
 4. Choose the location where you want to search, either by moving around the map or by using the search feature with coordinates in `lat, lon` format
 
-<p align="center"> <img src="https://github.com/Alb-310/Geogramint/blob/main/.github/Geogramint_search.png" width="700"/>
+<p align="center"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/Geogramint_search.png" width="700"/>
 
 5. Telegram will send you a verification code, write it in the pop-up window (+ your two-step verification password if you have one)
 
-<p align="center"> <img src="https://github.com/Alb-310/Geogramint/blob/main/.github/Geogramint_code.png" width="700"/>
+<p align="center"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/Geogramint_code.png" width="700"/>
 
 6. Then click `Start Search`
 7. All results will be displayed following: 
@@ -89,7 +89,7 @@ More details in the Wiki.
 
 (NB: results can also be found in `Geogramint/cache_telegram/` in `json` format + profiles pictures)
 
-<p align="center"> <img src="https://github.com/Alb-310/Geogramint/blob/main/.github/Geogramint_results.png" width="700"/>
+<p align="center"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/Geogramint_results.png" width="700"/>
 
 8. `Reset` will clear the results and erase the `cache_telegram`
 
@@ -97,7 +97,7 @@ More details in the Wiki.
 
 ## 📖 Wiki
 
-Remember to check the Wiki before posting an issue or asking a question.
+Remember to check the [Wiki](https://github.com/Alb-310/Geogramint/wiki) before posting an issue or asking a question.
 
 ## 📝 License
 
