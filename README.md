@@ -22,7 +22,7 @@ The tool is fully supported on Windows and partially supported on Mac OS and Lin
 
 ### On Windows [![Windows](https://svgshare.com/i/ZhY.svg)](https://svgshare.com/i/ZhY.svg)
 
-+ #### With the installer: Click [here!](https://github.com/Alb-310/Geogramint/releases/tag/1.0)
++ #### With the installer: Click [here!](https://github.com/Alb-310/Geogramint/releases)
 + #### With Github:
 ```bash
 git clone https://github.com/Alb-310/Geogramint.git
