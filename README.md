@@ -22,7 +22,7 @@ The tool is fully supported on Windows and partially supported on Mac OS and Lin
 
 ### On Windows [![Windows](https://svgshare.com/i/ZhY.svg)](https://svgshare.com/i/ZhY.svg)
 
-+ #### With the installer: Click here!
++ #### With the installer: Click [here!](https://github.com/Alb-310/Geogramint/releases/tag/1.0)
 + #### With Github:
 ```bash
 git clone https://github.com/Alb-310/Geogramint.git
@@ -59,7 +59,7 @@ pip install -r requirements.txt
 python geogramint.py
 ```
 
-More details in the Wiki.
+More details in the [Wiki](https://github.com/Alb-310/Geogramint/wiki/Installation-Guide).
 
 ## 📡 Example
 
@@ -93,7 +93,7 @@ More details in the Wiki.
 
 8. `Reset` will clear the results and erase the `cache_telegram`
 
-More details in the Wiki.
+More details in the [Wiki](https://github.com/Alb-310/Geogramint/wiki/Demonstration).
 
 ## 📖 Wiki
 
