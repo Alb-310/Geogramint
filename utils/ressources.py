@@ -232,12 +232,29 @@ def download_allprofilespics(client, ListofUser, ListofGroup):
     except OSError as error:
         Logger.warning("Geogramint Files: cache_telegram/groups already exist")
 
+    # verification of the contents of User and Group objects
+    invalid_objects = True
+    while invalid_objects:
+        invalid_objects = False
+        if len(ListofUser) > 0 and not ListofUser[0].id.isnumeric():
+            ListofUser.pop(0)
+            invalid_objects = True
+        if len(ListofGroup) > 0 and not ListofGroup[0].id.isnumeric():
+            ListofGroup.pop(0)
+            invalid_objects = True
+    if len(ListofUser) == 0 and len(ListofGroup) == 0:
+        raise Exception
+
     # download of users profile pics
     for elm in ListofUser:
+        if not elm.id.isnumeric():
+            continue
         client.download_profile_photo(int(elm.id), "cache_telegram/users/" + elm.id)
 
     # download of groups profile pics
     for elm in ListofGroup:
+        if not elm.id.isnumeric():
+            continue
         client.download_profile_photo(int(elm.id), "cache_telegram/groups/" + elm.id)
 
 

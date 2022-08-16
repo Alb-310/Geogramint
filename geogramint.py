@@ -1,4 +1,4 @@
-# v1.0
+# v1.0.1
 import codecs
 import trio
 import shutil
