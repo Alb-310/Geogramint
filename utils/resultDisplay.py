@@ -3,7 +3,7 @@ import os
 from kivy.app import App
 from kivy.properties import StringProperty
 from kivymd.uix.label import MDLabel
-from kivymd.utils import fitimage
+from kivymd.uix.fitimage import fitimage
 from kivymd.font_definitions import theme_font_styles
 from kivymd.uix.card import MDCard
 
