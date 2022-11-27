@@ -14,7 +14,7 @@ Geogramint only finds Telegram users and groups which have activated the nearby 
 
 The tool is fully supported on Windows and partially supported on Mac OS and Linux distributions.
 
-<p align="center"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/Geogramint_image.png" />
+<p align="center"> <img src="https://user-images.githubusercontent.com/52386954/204160964-7e86d0b3-7b05-4c30-b56a-66723c5298bb.png" />
 
 ## 🛠️ Installation
 
