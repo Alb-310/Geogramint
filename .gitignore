@@ -6,3 +6,11 @@ appfiles/config.ini
 *.session
 cache
 cache_telegram
+venv/*
+utils/__pycache__/
+mapfiles/__pycache__/
+api/__pycache__/
+kivy_garden/__pycache__/
+__pycache__
+debug
+no-debug

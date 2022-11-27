@@ -1,6 +1,7 @@
-telethon
-trio
-kivy
-kivymd
-kivy-garden
-mapview
+telethon==1.24.0
+trio==0.21.0
+kivy==2.1.0
+kivymd==1.0.2
+kivy-garden==0.1.5
+kivy-garden.mapview==1.0.6
+mapview==1.0.6
