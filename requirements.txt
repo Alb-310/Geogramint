@@ -1,3 +1,6 @@
+xhtml2pdf==0.2.8
+folium==0.14.0
+pandas==1.5.2
 telethon==1.24.0
 trio==0.21.0
 kivy==2.1.0
@@ -5,3 +8,9 @@ kivymd==1.0.2
 kivy-garden==0.1.5
 kivy-garden.mapview==1.0.6
 mapview==1.0.6
+typer==0.7.0
+rich==12.6.0
+selenium==4.7.2
+webdriver_manager==3.8.5
+plyer==2.1.0
+pandas==1.4.2

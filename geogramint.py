@@ -1,16 +1,18 @@
-# v1.1
+# v1.2
+import os
 import sys
 import codecs
 import trio
 import shutil
 import json
+import pandas as pd
 
 if len(sys.argv) < 2:
     from kivy.uix.image import AsyncImage
     from api import TelegramAPIRequests
     from threading import Thread
     from kivy.uix.boxlayout import BoxLayout
-    from kivymd.uix.button import MDFlatButton
+    from kivymd.uix.button import MDFlatButton, MDRaisedButton
     from kivymd.uix.dialog import MDDialog
     from kivymd.uix.textfield import MDTextField
     from kivy.app import App
@@ -24,6 +26,8 @@ if len(sys.argv) < 2:
     from mapfiles.markercenter import MarkerHelper
     from utils import settings
     from utils import resultDisplay
+    from plyer import filechooser
+    from utils import ressources
 
     lat = None
     lon = None
@@ -36,6 +40,10 @@ if len(sys.argv) < 2:
     api_hash = None
     phone_number = None
     error = False
+    export_report = None
+    extended_report = None
+    timestamp = None
+    real_lat, real_lon = None, None
 
     Loading = AsyncImage(
         pos_hint={'bottom': 1, 'right': 1},
@@ -60,12 +68,16 @@ if len(sys.argv) < 2:
     )
 
 
+else:
+    from CLI import geogramint_cli
+
+
 def telegramAPICall():
-    global lat, lon, users, groups, enabled, searchStarted, error
+    global lat, lon, users, groups, enabled, searchStarted, error, timestamp, real_lat, real_lon
     try:
-        users, groups = geolocate_AllEntities_Nearby(api_id, api_hash, phone_number, float(lat), float(lon))
+        real_lat, real_lon = lat, lon
+        users, groups, timestamp = geolocate_AllEntities_Nearby(api_id, api_hash, phone_number, float(lat), float(lon))
     except Exception as e:
-        # print(e)
         error = True
         Logger.info(f"Geogramint Search: Nothing Found")
         searchStarted = False
@@ -77,6 +89,11 @@ def telegramAPICall():
     json_string_group = json.dumps([ob.__dict__() for ob in groups], ensure_ascii=False)
     with codecs.open('cache_telegram/groups.json', 'w', 'utf-8') as f:
         f.write(json_string_group)
+
+    df = pd.read_json('cache_telegram/users.json')
+    df.to_csv('cache_telegram/users.csv', index=None)
+    df = pd.read_json('cache_telegram/groups.json')
+    df.to_csv('cache_telegram/groups.csv', index=None)
 
 
 def startSearch(dt):
@@ -161,16 +178,60 @@ def remove_erroranim(dt):
     App.get_running_app().root.ids.mapzone.remove_widget(error_anim)
 
 
+def export_pdf_report(dt):
+    global timestamp, users, groups, extended_report, real_lat, real_lon
+    current_dir = os.getcwd()
+
+    _path = filechooser.save_file(title="Export a Geogramint Report :",
+                                  filters=[("Geogramint Report", "*.pdf")])
+
+    os.chdir(current_dir)
+    if len(_path) == 0 or _path[0] == "":
+        return
+    path = _path[0]
+
+    if os.path.isdir(path):
+        if path[-1] != '/':
+            path += 'Report_' + str(lat) + ',' + str(lon) + '.pdf'
+        else:
+            path += '/Report_' + str(lat) + ',' + str(lon) + '.pdf'
+        try:
+            t = Thread(target=ressources.generate_pdf_report, args=(users, groups, real_lat, real_lon, timestamp, path,
+                                                                    extended_report))
+            t.start()
+        except:
+            Logger.info("Geogramint report: an error has occured during report creation")
+    elif not os.path.isfile(path):
+        if path[len(path) - 4:] != '.pdf':
+            path += '.pdf'
+        try:
+            t = Thread(target=ressources.generate_pdf_report, args=(users, groups, real_lat, real_lon, timestamp, path,
+                                                                    extended_report))
+            t.start()
+        except:
+            Logger.info("Geogramint report: an error has occured during report creation")
+    else:
+        return
+
+
 def background_loop(dt):
     """
     Main background loop of this app
     """
-    global lat, lon, users, enabled, Loading, error
+    global lat, lon, users, enabled, Loading, error, export_report
     lat = App.get_running_app().root.ids.mapview.ids.mark.lat
     lon = App.get_running_app().root.ids.mapview.ids.mark.lon
     if users is not None and enabled:
         App.get_running_app().root.ids.mapzone.remove_widget(Loading)
         App.get_running_app().root.ids.mapzone.add_widget(success_anim)
+        export_report = MDRaisedButton(
+            id="export",
+            text="[b]Export PDF[/b]",
+            md_bg_color=(1, 0.52, 0, 0.9),
+            pos_hint={'center_y': 0.05, 'center_x': 0.15}
+        )
+        export_report.bind(on_press=export_pdf_report)
+        App.get_running_app().root.ids.mapzone.add_widget(export_report)
         Clock.schedule_once(remove_successanim, success_anim.anim_delay * 100)
         for user in users:
             name = ""
@@ -234,35 +295,38 @@ def search_location(dt):
 
 
 def reload_settings(dt):
-    global api_id, api_hash, phone_number
-    api_id, api_hash, phone_number = settings.loadConfig()
+    global api_id, api_hash, phone_number, extended_report
+    api_id, api_hash, phone_number, extended_report = settings.loadConfig()
 
 
 def settings_menu(dt):
     global api_id, api_hash, phone_number
-    dialog = settings.settings_dialog(str(api_id), api_hash, phone_number)
+    dialog = settings.settings_dialog(str(api_id), api_hash, phone_number, extended_report)
     dialog.bind(on_dismiss=reload_settings)
     dialog.open()
 
 
 def reset(dt):
-    global users, groups, searchStarted
+    global users, groups, searchStarted, export_report
     shutil.rmtree("cache_telegram", ignore_errors=True)
     resultDisplay.UserList().clear_all()
     resultDisplay.GroupList().clear_all()
     users = None
     groups = None
     searchStarted = False
+    if export_report:
+        App.get_running_app().root.ids.mapzone.remove_widget(export_report)
+
 
 if len(sys.argv) < 2:
     class Geogramint(MDApp):
         def build(self):
-            global api_id, api_hash, phone_number
+            global api_id, api_hash, phone_number, extended_report
             Window.size = (1100, 600)
-            api_id, api_hash, phone_number = settings.loadConfig()
+            api_id, api_hash, phone_number, extended_report = settings.loadConfig()
 
         def on_start(self):
-            global loop
+            global loop, export_report
             self.window = GridLayout()
             self.icon = "appfiles/Geogramint.png"
             Config.set('input', 'mouse', 'mouse,disable_multitouch')
@@ -283,15 +347,18 @@ if len(sys.argv) < 2:
             shutil.rmtree("cache", ignore_errors=True)  # deleting cache created by Mapview
             Clock.unschedule(loop)
 
-
 if __name__ == "__main__":
     shutil.rmtree("cache_telegram", ignore_errors=True)
     shutil.rmtree("cache", ignore_errors=True)
-    try:
-        if len(sys.argv) < 2:
+
+    if len(sys.argv) < 2:
+        try:
             trio.run(Geogramint().run())
-        else:
-            print('CLI coming soon !')
-    except TypeError:
-        shutil.rmtree("cache", ignore_errors=True)
-        print()
+        except TypeError:
+            shutil.rmtree("cache", ignore_errors=True)
+    else:
+        geogramint_cli.CLI()
+    shutil.rmtree("cache", ignore_errors=True)
+    if os.path.exists("geckodriver.log"):
+        os.remove("geckodriver.log")
+    print()

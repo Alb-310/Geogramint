@@ -1,5 +1,6 @@
 import asyncio
 import os
+from datetime import datetime
 
 from kivy import Logger
 from telethon.errors import SessionPasswordNeededError
@@ -54,6 +55,10 @@ def geolocate_AllEntities_Nearby(api_id, api_hash, phone_number, latitude, longi
                 continue
         code_dialog = False
         connected = True
+    # datetime object containing current date and time
+    now = datetime.now()
+    # dd/mm/YY H:M:S
+    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     result = client(functions.contacts.GetLocatedRequest(
         geo_point=types.InputGeoPoint(
             lat=latitude,
@@ -73,4 +78,4 @@ def geolocate_AllEntities_Nearby(api_id, api_hash, phone_number, latitude, longi
     ListofUser = ressources.generate_ListOfUsers(usersList, peersList)
     ressources.download_allprofilespics(client, ListofUser, ListofGroup)
     client.disconnect()
-    return ListofUser, ListofGroup
+    return ListofUser, ListofGroup, dt_string

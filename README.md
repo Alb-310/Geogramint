@@ -61,7 +61,7 @@ python geogramint.py
 
 More details in the [Wiki](https://github.com/Alb-310/Geogramint/wiki/Installation-Guide).
 
-## 📡 Example
+## 📡 Example: GUI
 
 1. Start by creating an API key for your Telegram account [here](https://my.telegram.org). You will also need to put a profile picture on your account and, in your `Privacy and Security` settings, enable the profile picture for everyone.
 
@@ -94,6 +94,8 @@ More details in the [Wiki](https://github.com/Alb-310/Geogramint/wiki/Installati
 8. `Reset` will clear the results and erase the `cache_telegram`
 
 More details in the [Wiki](https://github.com/Alb-310/Geogramint/wiki/Demonstration).
+
+## 📡 Example: CLI
 
 ## 📖 Wiki
 
