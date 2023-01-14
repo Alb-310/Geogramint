@@ -133,7 +133,7 @@ More details in the [Wiki](https://github.com/Alb-310/Geogramint/wiki/Demonstrat
 
 6. `reset-scan` will clear `cache_telegram`
 
-More details in the [Wiki](https://github.com/Alb-310/Geogramint/wiki/Demonstration).
+More details in the [Wiki](https://github.com/Alb-310/Geogramint/wiki/Demonstration:-CLI).
   
 ## 📖 Wiki
 
