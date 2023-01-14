@@ -65,7 +65,8 @@ python geogramint.py --help # for CLI mode
 
 More details in the [Wiki](https://github.com/Alb-310/Geogramint/wiki/Installation-Guide).
 
-## 📡 Example
+
+## 📡 Example: GUI
 
 1. Start by creating an API key for your Telegram account [here](https://my.telegram.org). You will also need to put a profile picture on your account and, in your `Privacy and Security` settings, enable the profile picture for everyone.
 
@@ -97,42 +98,7 @@ More details in the [Wiki](https://github.com/Alb-310/Geogramint/wiki/Installati
 
 8. `Reset` will clear the results and erase the `cache_telegram`
 
-More details in the [Wiki](https://github.com/Alb-310/Geogramint/wiki/Demonstration).
-
-
-## 📡 Example: GUI
-
-1. Start by creating an API key for your Telegram account [here](https://my.telegram.org). You will also need to put a profile picture on your account and, in your `Privacy and Security` settings, enable the profile picture for everyone.
-
-<p align="center"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/privacy_settings.jpg" width="300"/>
-
-2. Launch **Geogramint**
-3. In the settings, write your information (api_id, api_hash and phone number) and then `save`
-
-<p align="center"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/Geogramint_settings_1.png" width="500"/> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/Geogramint_settings_2.png" width="500"/>
-
-4. Choose the location where you want to search, either by moving around the map or by using the search feature with coordinates in `lat, lon` format
-
-<p align="center"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/Geogramint_search.png" width="700"/>
-
-5. Telegram will send you a verification code, write it in the pop-up window (+ your two-step verification password if you have one)
-
-<p align="center"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/Geogramint_code.png" width="700"/>
-
-6. Then click `Start Search`
-7. All results will be displayed following: 
-+ green for 500m
-+ yellow for 1000m
-+ orange for 2000m
-+ red for >3000m
-
-(NB: results can also be found in `Geogramint/cache_telegram/` in `json` format + profiles pictures)
-
-<p align="center"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/Geogramint_results.png" width="700"/>
-
-8. `Reset` will clear the results and erase the `cache_telegram`
-
-More details in the [Wiki](https://github.com/Alb-310/Geogramint/wiki/Demonstration).
+More details in the [Wiki](https://github.com/Alb-310/Geogramint/wiki/Demonstration:-GUI).
 
 ## 📡 Example: CLI
 
