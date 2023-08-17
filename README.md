@@ -3,7 +3,7 @@
 <img src="https://github.com/Alb-310/Geogramint/blob/master/appfiles/Geogramint.png" width="300"/>
 </p>
 
-<p align="center"> <img src="https://img.shields.io/badge/version-1.2-orange" /> <img src="http://ForTheBadge.com/images/badges/made-with-python.svg"/> <a href="https://github.com/Alb-310"> <img alt="GitHub" src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white"/><a/> <a href="https://twitter.com/Alb_310"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/by-alb310.svg"/><a/> <img src="https://img.shields.io/badge/License-GPLv3-blue.svg"/>
+<p align="center"> <img src="https://img.shields.io/badge/version-1.3-orange" /> <img src="https://img.shields.io/badge/PYTHON-03b1fc?style=for-the-badge&logo=python"/> <a href="https://github.com/Alb-310"> <img alt="GitHub" src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white"/><a/> <a href="https://twitter.com/Alb_310"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/by-alb310.svg"/><a/> <img src="https://img.shields.io/badge/License-GPLv3-blue.svg"/>
 <p align="center"> <a href="https://projetfox.com/"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/fox%20badge.png" width="200"/> <a/>
 
 ## **About**
@@ -20,7 +20,7 @@ The tool is fully supported on Windows and partially supported on Mac OS and Lin
 
 **Requirements:** [Python 3.8 or 3.9](https://www.python.org/downloads/release/python-3913/)<br>
 
-### On Windows [![Windows](https://svgshare.com/i/ZhY.svg)](https://svgshare.com/i/ZhY.svg)
+### On Windows [![Windows](https://img.shields.io/badge/Windows-03b1fc?style=for-the-badge&logo=windows)](https://svgshare.com/i/ZhY.svg)
 
 + #### With the installer: Click [here!](https://github.com/Alb-310/Geogramint/releases)
 + #### With Github:
@@ -42,7 +42,7 @@ python geogramint.py # for GUI mode
 python geogramint.py --help # for CLI mode
 ```
 
-### On Mac OS  [![macOS](https://svgshare.com/i/ZjP.svg)](https://svgshare.com/i/ZjP.svg) and Linux [![Linux](https://svgshare.com/i/Zhy.svg)](https://svgshare.com/i/Zhy.svg)
+### On Mac OS  ![macOS](https://img.shields.io/badge/Mac_OS-abbfc7?style=for-the-badge&logo=apple) and Linux ![Linux](https://img.shields.io/badge/Linux-ffffff?style=for-the-badge&logo=linux)
 
 + #### With Github:
 ```bash

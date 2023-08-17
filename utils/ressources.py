@@ -12,6 +12,7 @@ from selenium import webdriver
 from xhtml2pdf import pisa, default
 from xhtml2pdf.default import DEFAULT_CSS
 from xhtml2pdf.files import pisaFileObject
+from selenium.webdriver.chrome.service import Service as ChromeService
 
 
 '''
@@ -348,7 +349,7 @@ def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended
     else:
         zoom = 15
 
-    service = ChromeDriverManager(path="appfiles").install()
+    service = ChromeService(ChromeDriverManager().install())
     m = folium.Map(location=[lat, lon], zoom_start=zoom)
     folium.Marker(
         [lat, lon]
@@ -394,7 +395,7 @@ def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended
     options.add_experimental_option("excludeSwitches", ["enable-logging"])
     options.add_argument('--headless')
     options.add_argument('window-size=1920x1080')
-    driver = webdriver.Chrome(executable_path=service, chrome_options=options)
+    driver = webdriver.Chrome(service=service, options=options)
     driver.maximize_window()
     driver.get(temp_name)
     time.sleep(5)
