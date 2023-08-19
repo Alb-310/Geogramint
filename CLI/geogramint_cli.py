@@ -1,3 +1,4 @@
+__version__ = "v1.3"
 import codecs
 import json
 import os
@@ -38,6 +39,19 @@ logo_ascii = """
 CLI = typer.Typer(rich_markup_mode="rich", help=logo_ascii)
 console = Console()
 
+
+def version_callback(value: bool):
+    if value:
+        typer.echo(f"{__version__}")
+        raise typer.Exit()
+
+@CLI.callback()
+def version(
+    version: bool = typer.Option(
+        False, "--version", help="Show the version", callback=version_callback
+    )
+):
+    pass
 
 @CLI.command(rich_help_panel='Config Commands')
 def set_hash(hash: str):

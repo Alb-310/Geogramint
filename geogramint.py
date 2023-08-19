@@ -1,4 +1,4 @@
-# v1.2
+# v1.3
 import os
 import sys
 import codecs
@@ -21,7 +21,7 @@ if len(sys.argv) < 2:
     from kivy.config import Config
     from kivymd.app import MDApp
     from kivy.core.window import Window
-    from kivy.logger import Logger
+    from kivy.logger import Logger, LOG_LEVELS
     from api.TelegramAPIRequests import geolocate_AllEntities_Nearby
     from mapfiles.markercenter import MarkerHelper
     from utils import settings
