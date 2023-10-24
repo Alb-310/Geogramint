@@ -1,13 +1,10 @@
 import os
 import typer
 
-
 from rich.progress import Progress
 from datetime import datetime
-from telethon.errors import SessionPasswordNeededError
 from telethon.sync import TelegramClient
 from telethon import functions, types
-from rich import print
 
 from CLI import ressources_cli
 
@@ -23,7 +20,8 @@ def geolocate_AllEntities_Nearby(api_id, api_hash, latitude, longitude, pictures
     except OSError:
         typer.echo(
             typer.style("[WARNING] cache_telegram folder already exist", fg=typer.colors.YELLOW, bold=True))
-    with TelegramClient("Geogramint", api_id, api_hash) as client:
+    with TelegramClient("Geogramint", api_id, api_hash, device_model="A320MH", app_version="2.1.4a",
+                        system_version="Windows 10", lang_code="en", system_lang_code="fr-FR") as client:
         client.connect()
 
         # datetime object containing current date and time
@@ -40,12 +38,12 @@ def geolocate_AllEntities_Nearby(api_id, api_hash, latitude, longitude, pictures
         ))
         res = result.stringify()
 
-    # parse the result of the API request and Isolate important components
+        # parse the result of the API request and Isolate important components
         usersList = ressources_cli.isolation_Users(res)
         peersList = ressources_cli.isolation_Peers(res)
         channelsList = ressources_cli.isolation_Channels(res)
 
-    # Create List of Objects from the isolated components
+        # Create List of Objects from the isolated components
         ListofGroup = ressources_cli.generate_ListOfGroups(channelsList, peersList)
         ListofUser = ressources_cli.generate_ListOfUsers(usersList, peersList)
         if pictures:

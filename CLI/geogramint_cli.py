@@ -1,16 +1,21 @@
 __version__ = "v1.3"
+
 import codecs
-import json
 import os
 import shutil
 import typer
-import rich
 import pandas as pd
 
 from rich.console import Console
 from rich.table import Table
 from CLI import settings_cli, ressources_cli
 from CLI.TelegramAPIRequests_CLI import geolocate_AllEntities_Nearby
+from CLI import surveillance_cli
+import json
+import time
+import difflib
+from datetime import datetime, timedelta
+import random
 
 logo_ascii = """
 \033[38;5;172;49m___________________________________________________\033[1;0m\n
@@ -45,13 +50,15 @@ def version_callback(value: bool):
         typer.echo(f"{__version__}")
         raise typer.Exit()
 
+
 @CLI.callback()
 def version(
-    version: bool = typer.Option(
-        False, "--version", help="Show the version", callback=version_callback
-    )
+        version: bool = typer.Option(
+            False, "--version", help="Show the version", callback=version_callback
+        )
 ):
     pass
+
 
 @CLI.command(rich_help_panel='Config Commands')
 def set_hash(hash: str):
@@ -95,6 +102,7 @@ def set_config(id: int, hash: str, phone: str, extended_report: bool = typer.Opt
 def start_scan(lat: float, lon: float, output_json: str = typer.Option("cache_telegram", help="Directory Path"),
                output_csv: str = typer.Option("", help="Directory Path"),
                output_pdf: str = typer.Option("", help="Directory Path"),
+               output_osintracker: str = typer.Option("", help="Directory Path"),
                profile_pictures: bool = typer.Option(True, help="enable or disable profile pictures download")):
     print(logo_ascii)
     api_id, api_hash, phone_number, extended_report = settings_cli.loadConfig()
@@ -165,6 +173,11 @@ def start_scan(lat: float, lon: float, output_json: str = typer.Option("cache_te
             output_pdf = output_pdf[:-1]
         ressources_cli.generate_pdf_report(users, groups, lat, lon, dt_string, output_pdf, extended_report)
 
+    if output_osintracker != "":
+        if output_osintracker[-1] == '/':
+            output_osintracker = output_osintracker[:-1]
+        ressources_cli.generate_osintracker_investigation(users, groups, lat, lon, output_osintracker, extended_report)
+
 
 @CLI.command(rich_help_panel='Actions Commands')
 def reset_scan():
@@ -173,3 +186,61 @@ def reset_scan():
     if os.path.exists("geckodriver.log"):
         os.remove("geckodriver.log")
     typer.echo(typer.style("cache_telegram deleted", fg=typer.colors.RED, bold=True))
+
+
+@CLI.command(rich_help_panel='Actions Commands')
+def surveillance(lat: float, lon: float, num_days: int = typer.Argument(help="Days of Active Surveillance"),
+                 webhook: str = typer.Argument(help="Discord Webhook url")):
+    """
+    EXPERIMENTAL FEATURE : Work In Progress
+    This command aims to permit its user to establish a surveillance on an area using Geogramint.
+    The tool will launch scan every ~1h and retrieve all users and compare it with its previous scan.
+    If changes are detected, the results will be sent to through the discord webhook.
+    """
+    print(logo_ascii)
+    api_id, api_hash, phone_number, extended_report = settings_cli.loadConfig()
+    typer.echo(typer.style("Config Loaded !", fg=typer.colors.GREEN, bold=True))
+
+    end_date = datetime.now() + timedelta(days=num_days)
+    previous_output = ""
+
+    while datetime.now() < end_date:
+
+        users, groups, dt_string = geolocate_AllEntities_Nearby(api_id, api_hash, lat, lon, True)
+        ressources_cli.generate_pdf_report(users, groups, lat, lon, dt_string, "cache_telegram", False)
+
+        json_string_user = json.dumps([ob.__dict__() for ob in users], ensure_ascii=False)
+        with codecs.open('cache_telegram/users.json', 'w', 'utf-8') as f:
+            f.write(json_string_user)
+
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        new_output_filename = f"cache_telegram/sorted_users_{timestamp}.txt"
+
+        surveillance_cli.process_users("cache_telegram/users.json", new_output_filename)
+
+        with open(new_output_filename, "r", encoding="utf-8") as new_output_file:
+            new_output = new_output_file.readlines()
+
+        diff = difflib.unified_diff(previous_output, new_output, lineterm="")
+        diff_text = "\n".join(diff)
+        if diff_text:
+            notification = f"Movement found at {timestamp}:\n{diff_text}"
+            print(notification)
+            surveillance_cli.send_webhook_notification(webhook, notification, None)
+            with open(f"cache_telegram/Report_{str(lat)},{str(lon)}.pdf", "rb") as pdf_file:
+                files = {"file": ("Report.pdf", pdf_file)}
+                surveillance_cli.send_webhook_notification(webhook, notification, files)
+        else:
+            print(f"No Movement at {timestamp}")
+
+        previous_output = new_output
+
+        shutil.rmtree("cache_telegram/users/", ignore_errors=True)
+        shutil.rmtree("cache_telegram/groups/", ignore_errors=True)
+        shutil.rmtree("cache_telegram/reportfiles/", ignore_errors=True)
+        shutil.rmtree("cache", ignore_errors=True)
+        time.sleep(3600 + random.randint(0, 60))  # Sleep for an hour with random seconds to diminish the risks of
+                                                  # ban by Telegram
+
+    shutil.rmtree("cache_telegram", ignore_errors=True)
+    shutil.rmtree("cache", ignore_errors=True)

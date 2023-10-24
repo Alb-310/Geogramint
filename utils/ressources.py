@@ -1,19 +1,24 @@
-from kivy import Logger
-
-from utils import User
-from utils import Group
 import os
 import time
 import folium
+import codecs
+import json
 
+from kivy import Logger
+from utils import User
+from utils import Group
 from io import BytesIO
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
 from selenium import webdriver
 from xhtml2pdf import pisa, default
 from xhtml2pdf.default import DEFAULT_CSS
 from xhtml2pdf.files import pisaFileObject
 from selenium.webdriver.chrome.service import Service as ChromeService
-
+from selenium.webdriver.edge.service import Service as EdgeService
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from utils.osintracker_export import generate_empty_dexie_json, fill_dexie_json
 
 '''
 A function that parse the result of Telegram's API request
@@ -24,6 +29,8 @@ and isolate the Users
 :return str
     isolated string that contain all users
 '''
+
+
 def isolation_Users(res):
     usersStrtIndex = str.find(res, "users=[")
     usersEndIndex = str.find(res, "\n\t],", usersStrtIndex)
@@ -264,7 +271,6 @@ def download_allprofilespics(client, ListofUser, ListofGroup):
 
 
 def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended_report):
-
     global_template = '''
     <meta charset="UTF-8">
     <pdf:language name="arabic"/>
@@ -348,8 +354,29 @@ def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended
         zoom = 14
     else:
         zoom = 15
+    try:
+        service = ChromeService(ChromeDriverManager().install())
+        options = webdriver.ChromeOptions()
+        options.add_experimental_option("excludeSwitches", ["enable-logging"])
+        options.add_argument('--headless')
+        options.add_argument('window-size=1920x1080')
+        driver = webdriver.Chrome(service=service, options=options)
+    except:
+        try:
+            service = EdgeService(EdgeChromiumDriverManager().install())
+            options = webdriver.EdgeOptions()
+            options.use_chromium = True
+            options.add_argument("disable-logging")
+            options.add_argument('--headless')
+            options.add_argument('window-size=1920x1080')
+            driver = webdriver.Edge(service=service, options=options)
+        except:
+            service = FirefoxService(GeckoDriverManager().install())
+            options = webdriver.FirefoxOptions()
+            options.add_argument('--headless')
+            options.add_argument('window-size=1920x1080')
+            driver = webdriver.Firefox(service=service, options=options)
 
-    service = ChromeService(ChromeDriverManager().install())
     m = folium.Map(location=[lat, lon], zoom_start=zoom)
     folium.Marker(
         [lat, lon]
@@ -391,11 +418,6 @@ def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended
 
     temp_name = "file://" + os.path.abspath('cache_telegram/reportfiles/map.html')
 
-    options = webdriver.ChromeOptions()
-    options.add_experimental_option("excludeSwitches", ["enable-logging"])
-    options.add_argument('--headless')
-    options.add_argument('window-size=1920x1080')
-    driver = webdriver.Chrome(service=service, options=options)
     driver.maximize_window()
     driver.get(temp_name)
     time.sleep(5)
@@ -404,9 +426,9 @@ def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended
 
     distance = '<p style="font-size: 15px; color: {col};"><strong>{dist}m</strong></p>'
     template = global_template.format(date=timestamp, lat=lat, lon=lon,
-                                             font=r"@font-face { font-family: 'test'; src: url("
-                                                  r"'appfiles/DejaVuSans.ttf') } "
-                                                  r"p { font-family: 'test' }")
+                                      font=r"@font-face { font-family: 'test'; src: url("
+                                           r"'appfiles/DejaVuSans.ttf') } "
+                                           r"p { font-family: 'test' }")
 
     template += start_user_table
 
@@ -471,3 +493,15 @@ def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended
     pisaFileObject.getNamedFile = lambda self: self.uri
 
     pdf = pisa.pisaDocument(BytesIO(template.encode("UTF-8")), result_file, encoding='UTF-8')
+
+
+def generate_osintracker_investigation(users, groups, lat, lon, path, extended_report):
+
+    dexie = generate_empty_dexie_json()
+
+    osintracker_investigation = fill_dexie_json(users, groups, f"{lat}, {lon}", dexie,
+                                                extended_report)
+
+    json_osintracker = json.dumps(osintracker_investigation, ensure_ascii=False, indent=4)
+    with codecs.open(path, 'w', 'utf-8') as f:
+        f.write(json_osintracker)

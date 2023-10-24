@@ -1,4 +1,4 @@
-# v1.3
+# v1.4
 import os
 import sys
 import codecs
@@ -12,7 +12,7 @@ if len(sys.argv) < 2:
     from api import TelegramAPIRequests
     from threading import Thread
     from kivy.uix.boxlayout import BoxLayout
-    from kivymd.uix.button import MDFlatButton, MDRaisedButton
+    from kivymd.uix.button import MDFlatButton, MDRaisedButton, MDIconButton
     from kivymd.uix.dialog import MDDialog
     from kivymd.uix.textfield import MDTextField
     from kivy.app import App
@@ -21,7 +21,7 @@ if len(sys.argv) < 2:
     from kivy.config import Config
     from kivymd.app import MDApp
     from kivy.core.window import Window
-    from kivy.logger import Logger, LOG_LEVELS
+    from kivy.logger import Logger
     from api.TelegramAPIRequests import geolocate_AllEntities_Nearby
     from mapfiles.markercenter import MarkerHelper
     from utils import settings
@@ -41,6 +41,7 @@ if len(sys.argv) < 2:
     phone_number = None
     error = False
     export_report = None
+    export_osintracker = None
     extended_report = None
     timestamp = None
     real_lat, real_lon = None, None
@@ -213,12 +214,44 @@ def export_pdf_report(dt):
     else:
         return
 
+def export_osintracker_investigation(dt):
+    global timestamp, users, groups, extended_report, real_lat, real_lon
+    current_dir = os.getcwd()
+
+    _path = filechooser.save_file(title="Export Geogramint search data to Osintracker Investigation :",
+                                  filters=[("Osintracker Export", "*.json")])
+
+    os.chdir(current_dir)
+    if len(_path) == 0 or _path[0] == "":
+        return
+    path = _path[0]
+
+    if os.path.isdir(path):
+        if path[-1] != '/':
+            path += 'Geogramint_' + str(lat) + ',' + str(lon) + '.json'
+        else:
+            path += '/Geogramint_' + str(lat) + ',' + str(lon) + '.json'
+        try:
+            t = Thread(target=ressources.generate_osintracker_investigation, args=(users, groups, real_lat, real_lon, path, extended_report))
+            t.start()
+        except:
+            Logger.info("Osintracker Export: an error has occured during investigation creation")
+    elif not os.path.isfile(path):
+        if path[len(path) - 12:] != '.json':
+            path += '.json'
+        try:
+            t = Thread(target=ressources.generate_osintracker_investigation, args=(users, groups, real_lat, real_lon, path, extended_report))
+            t.start()
+        except:
+            Logger.info("Osintracker Export: an error has occured during investigation creation")
+    else:
+        return
 
 def background_loop(dt):
     """
     Main background loop of this app
     """
-    global lat, lon, users, enabled, Loading, error, export_report
+    global lat, lon, users, enabled, Loading, error, export_report, export_osintracker
     lat = App.get_running_app().root.ids.mapview.ids.mark.lat
     lon = App.get_running_app().root.ids.mapview.ids.mark.lon
     if users is not None and enabled:
@@ -230,8 +263,18 @@ def background_loop(dt):
             md_bg_color=(1, 0.52, 0, 0.9),
             pos_hint={'center_y': 0.05, 'center_x': 0.15}
         )
+        export_osintracker = MDIconButton(
+            id="osintracker",
+            text=" ",
+            pos_hint={'center_y': 0.05, 'center_x': 0.3},
+            icon='appfiles/osintracker.png',
+            icon_size="35sp"
+        )
+
         export_report.bind(on_press=export_pdf_report)
+        export_osintracker.bind(on_press=export_osintracker_investigation)
         App.get_running_app().root.ids.mapzone.add_widget(export_report)
+        App.get_running_app().root.ids.mapzone.add_widget(export_osintracker)
         Clock.schedule_once(remove_successanim, success_anim.anim_delay * 100)
         for user in users:
             name = ""
@@ -307,7 +350,7 @@ def settings_menu(dt):
 
 
 def reset(dt):
-    global users, groups, searchStarted, export_report
+    global users, groups, searchStarted, export_report, export_osintracker
     shutil.rmtree("cache_telegram", ignore_errors=True)
     resultDisplay.UserList().clear_all()
     resultDisplay.GroupList().clear_all()
@@ -316,6 +359,7 @@ def reset(dt):
     searchStarted = False
     if export_report:
         App.get_running_app().root.ids.mapzone.remove_widget(export_report)
+        App.get_running_app().root.ids.mapzone.remove_widget(export_osintracker)
 
 
 if len(sys.argv) < 2:

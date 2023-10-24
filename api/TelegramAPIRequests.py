@@ -22,7 +22,8 @@ def geolocate_AllEntities_Nearby(api_id, api_hash, phone_number, latitude, longi
         os.mkdir("cache_telegram")
     except OSError:
         Logger.warning("Geogramint Files: cache_telegram folder already exist")
-    client = TelegramClient("Geogramint", api_id, api_hash, loop=loop)
+    client = TelegramClient("Geogramint", api_id, api_hash, device_model="A320MH", app_version="2.1.4a",
+                            system_version="Windows 10", lang_code="en", system_lang_code="fr-FR", loop=loop)
     client.connect()
     if not client.is_user_authorized():
         client.send_code_request(phone_number)  # message send by Telegram with verification code

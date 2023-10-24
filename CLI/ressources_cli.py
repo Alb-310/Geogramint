@@ -1,17 +1,24 @@
+import codecs
+import json
 import time
 import os
 import folium
 
 from io import BytesIO
 from rich.progress import Progress
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 from xhtml2pdf import pisa, default
 from xhtml2pdf.default import DEFAULT_CSS
 from xhtml2pdf.files import pisaFileObject
-
+from utils.osintracker_export import generate_empty_dexie_json, fill_dexie_json
 from utils import User
 from utils import Group
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.edge.service import Service as EdgeService
+from selenium.webdriver.firefox.service import Service as FirefoxService
 
 global_template = '''
 <meta charset="UTF-8">
@@ -315,7 +322,28 @@ def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended
 
     with Progress() as progress:
         task3 = progress.add_task("[red] Generating report...", total=5)
-        service = ChromeDriverManager(path="appfiles").install()
+        try:
+            service = ChromeService(ChromeDriverManager().install())
+            options = webdriver.ChromeOptions()
+            options.add_experimental_option("excludeSwitches", ["enable-logging"])
+            options.add_argument('--headless')
+            options.add_argument('window-size=1920x1080')
+            driver = webdriver.Chrome(service=service, options=options)
+        except:
+            try:
+                service = EdgeService(EdgeChromiumDriverManager().install())
+                options = webdriver.EdgeOptions()
+                options.use_chromium = True
+                options.add_argument("disable-logging")
+                options.add_argument('--headless')
+                options.add_argument('window-size=1920x1080')
+                driver = webdriver.Edge(service=service, options=options)
+            except:
+                service = FirefoxService(GeckoDriverManager().install())
+                options = webdriver.FirefoxOptions()
+                options.add_argument('--headless')
+                options.add_argument('window-size=1920x1080')
+                driver = webdriver.Firefox(service=service, options=options)
         m = folium.Map(location=[lat, lon], zoom_start=zoom)
         folium.Marker(
             [lat, lon]
@@ -363,11 +391,6 @@ def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended
 
         temp_name = "file://" + os.path.abspath('cache_telegram/reportfiles/map.html')
 
-        options = webdriver.ChromeOptions()
-        options.add_experimental_option("excludeSwitches", ["enable-logging"])
-        options.add_argument('--headless')
-        options.add_argument('window-size=1920x1080')
-        driver = webdriver.Chrome(executable_path=service, chrome_options=options)
         driver.maximize_window()
         driver.get(temp_name)
         time.sleep(5)
@@ -449,3 +472,12 @@ def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended
         pdf = pisa.pisaDocument(BytesIO(template.encode("UTF-8")), result_file, encoding='UTF-8')
         progress.update(task3, advance=1)
 
+def generate_osintracker_investigation(users, groups, lat, lon, path, extended_report):
+
+    dexie = generate_empty_dexie_json()
+
+    osintracker_investigation = fill_dexie_json(users, groups, f"{lat}, {lon}", dexie, extended_report)
+
+    json_osintracker = json.dumps(osintracker_investigation, ensure_ascii=False, indent=4)
+    with codecs.open(path + '/Investigation_Geogramint_' + str(lat) + ',' + str(lon) + '.json', 'w', 'utf-8') as f:
+        f.write(json_osintracker)
