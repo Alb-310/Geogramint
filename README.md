@@ -3,7 +3,7 @@
 <img src="https://github.com/Alb-310/Geogramint/blob/master/appfiles/Geogramint.png" width="300"/>
 </p>
 
-<p align="center"> <img src="https://img.shields.io/badge/version-1.3-orange" /> <img src="https://img.shields.io/badge/PYTHON-03b1fc?style=for-the-badge&logo=python"/> <a href="https://github.com/Alb-310"> <img alt="GitHub" src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white"/><a/> <a href="https://twitter.com/Alb_310"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/by-alb310.svg"/><a/> <img src="https://img.shields.io/badge/License-GPLv3-blue.svg"/>
+<p align="center"> <img src="https://img.shields.io/badge/version-1.4-orange" /> <img src="https://img.shields.io/badge/PYTHON-03b1fc?style=for-the-badge&logo=python"/> <a href="https://github.com/Alb-310"> <img alt="GitHub" src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white"/><a/> <a href="https://twitter.com/Alb_310"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/by-alb310.svg"/><a/> <img src="https://img.shields.io/badge/License-GPLv3-blue.svg"/>
 <p align="center"> <a href="https://projetfox.com/"> <img src="https://github.com/Alb-310/Geogramint/blob/master/.github/fox%20badge.png" width="200"/> <a/>
 
 ## **About**
@@ -14,7 +14,7 @@ Geogramint only finds Telegram users and groups which have activated the nearby 
 
 The tool is fully supported on Windows and partially supported on Mac OS and Linux distributions.
 
-<p align="center"> <img src="https://github.com/Alb-310/Geogramint/assets/52386954/08acece0-49d1-433e-b4de-b3397360e113" />
+<p align="center"> <img src="https://github.com/Alb-310/Geogramint/assets/52386954/7dde5789-2a58-438e-a256-06b4612f1443" />
 
 ## 🛠️ Installation
 
