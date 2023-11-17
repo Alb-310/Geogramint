@@ -1,21 +1,22 @@
 __version__ = "v1.3"
 
 import codecs
+import difflib
+import json
 import os
+import random
 import shutil
-import typer
-import pandas as pd
+import time
+from datetime import datetime, timedelta
 
+import pandas as pd
+import typer
 from rich.console import Console
 from rich.table import Table
+
 from CLI import settings_cli, ressources_cli
-from CLI.TelegramAPIRequests_CLI import geolocate_AllEntities_Nearby
 from CLI import surveillance_cli
-import json
-import time
-import difflib
-from datetime import datetime, timedelta
-import random
+from CLI.TelegramAPIRequests_CLI import geolocate_AllEntities_Nearby
 
 logo_ascii = """
 \033[38;5;172;49m___________________________________________________\033[1;0m\n
@@ -129,39 +130,30 @@ def start_scan(lat: float, lon: float, output_json: str = typer.Option("cache_te
     console.print("[orange1]Users detected :")
     table = Table("ID", "First Name", "Last Name", "Username", "Phone", "Distance")
     for elm in users:
-        if elm.distance == '500':
-            color = '[bright_green]'
-        elif elm.distance == '1000':
+        if elm.distance == '1000':
             color = '[khaki1]'
         elif elm.distance == '2000':
             color = '[orange1]'
+        elif elm.distance == '500':
+            color = '[bright_green]'
         else:
             color = '[indian_red]'
 
-        if elm.lastname is not None:
-            lastname = color + elm.lastname[1:-1]
-        else:
-            lastname = ""
-        if elm.username is not None:
-            username = color + elm.username[1:-1]
-        else:
-            username = ""
-        if elm.phone is not None:
-            phone = color + '+' + elm.phone[1:-1]
-        else:
-            phone = ""
+        lastname = color + elm.lastname[1:-1] if elm.lastname is not None else ""
+        username = color + elm.username[1:-1] if elm.username is not None else ""
+        phone = color + '+' + elm.phone[1:-1] if elm.phone is not None else ""
         table.add_row(color + elm.id, color + elm.firstname[1:-1], lastname, username,
                       phone, color + elm.distance)
     console.print(table)
     console.print("[grey93]Groups detected :")
     table_g = Table("ID", "Name", "Distance")
     for elm in groups:
-        if elm.distance == '500':
-            color = '[bright_green]'
-        elif elm.distance == '1000':
+        if elm.distance == '1000':
             color = '[khaki1]'
         elif elm.distance == '2000':
             color = '[orange1]'
+        elif elm.distance == '500':
+            color = '[bright_green]'
         else:
             color = '[indian_red]'
 
@@ -222,12 +214,11 @@ def surveillance(lat: float, lon: float, num_days: int = typer.Argument(help="Da
             new_output = new_output_file.readlines()
 
         diff = difflib.unified_diff(previous_output, new_output, lineterm="")
-        diff_text = "\n".join(diff)
-        if diff_text:
+        if diff_text := "\n".join(diff):
             notification = f"Movement found at {timestamp}:\n{diff_text}"
             print(notification)
             surveillance_cli.send_webhook_notification(webhook, notification, None)
-            with open(f"cache_telegram/Report_{str(lat)},{str(lon)}.pdf", "rb") as pdf_file:
+            with open(f"cache_telegram/Report_{lat},{lon}.pdf", "rb") as pdf_file:
                 files = {"file": ("Report.pdf", pdf_file)}
                 surveillance_cli.send_webhook_notification(webhook, notification, files)
         else:
@@ -240,7 +231,7 @@ def surveillance(lat: float, lon: float, num_days: int = typer.Argument(help="Da
         shutil.rmtree("cache_telegram/reportfiles/", ignore_errors=True)
         shutil.rmtree("cache", ignore_errors=True)
         time.sleep(3600 + random.randint(0, 60))  # Sleep for an hour with random seconds to diminish the risks of
-                                                  # ban by Telegram
+                # ban by Telegram
 
     shutil.rmtree("cache_telegram", ignore_errors=True)
     shutil.rmtree("cache", ignore_errors=True)

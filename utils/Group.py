@@ -26,7 +26,6 @@ class Group:
         self.distance = _distance
         self.name = _name
 
-
     def __dict__(self):
         return {
             'id': self.id,

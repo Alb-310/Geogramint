@@ -1,24 +1,25 @@
 import codecs
 import json
-import time
 import os
-import folium
-
+import time
 from io import BytesIO
+
+import folium
 from rich.progress import Progress
 from selenium import webdriver
-from xhtml2pdf import pisa, default
-from xhtml2pdf.default import DEFAULT_CSS
-from xhtml2pdf.files import pisaFileObject
-from utils.osintracker_export import generate_empty_dexie_json, fill_dexie_json
-from utils import User
-from utils import Group
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.microsoft import EdgeChromiumDriverManager
-from webdriver_manager.firefox import GeckoDriverManager
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.edge.service import Service as EdgeService
 from selenium.webdriver.firefox.service import Service as FirefoxService
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
+from xhtml2pdf import pisa, default
+from xhtml2pdf.default import DEFAULT_CSS
+from xhtml2pdf.files import pisaFileObject
+
+from utils import Group
+from utils import User
+from utils.osintracker_export import generate_empty_dexie_json, fill_dexie_json
 
 global_template = '''
 <meta charset="UTF-8">
@@ -108,8 +109,7 @@ and isolate the Users
 def isolation_Users(res):
     usersStrtIndex = str.find(res, "users=[")
     usersEndIndex = str.find(res, "\n\t],", usersStrtIndex)
-    usersList = res[usersStrtIndex:usersEndIndex + len("\n\t]")]
-    return usersList
+    return res[usersStrtIndex:usersEndIndex + len("\n\t]")]
 
 
 '''
@@ -126,8 +126,7 @@ and isolate the Channels
 def isolation_Channels(res):
     channelsStrtIndex = str.find(res, "chats=[")
     channelsEndIndex = str.find(res, "\n\t],", channelsStrtIndex)
-    channelsList = res[channelsStrtIndex:channelsEndIndex + len("\n\t]")]
-    return channelsList
+    return res[channelsStrtIndex:channelsEndIndex + len("\n\t]")]
 
 
 '''
@@ -144,8 +143,7 @@ and isolate the Peers
 def isolation_Peers(res):
     peersStrtIndex = str.find(res, "peers=[")
     peersEndIndex = str.find(res, "\n\t],", peersStrtIndex)
-    peersList = res[peersStrtIndex:peersEndIndex + len("\n\t]")]
-    return peersList
+    return res[peersStrtIndex:peersEndIndex + len("\n\t]")]
 
 
 '''
@@ -229,20 +227,23 @@ def generate_ListOfUsers(usersList, peersList):
 
     # Cleaning attributes of User Object
     for elm in output:
-        if elm.id == 'None':
-            elm.id = None
-        if elm.distance == 'None':
-            elm.distance = None
-        if elm.firstname == 'None':
-            elm.firstname = None
-        if elm.lastname == 'None':
-            elm.lastname = None
-        if elm.username == 'None':
-            elm.username = None
-        if elm.phone == 'None':
-            elm.phone = None
-
+        _clean_user_attributes(elm)
     return output
+
+
+def _clean_user_attributes(elm):
+    if elm.id == 'None':
+        elm.id = None
+    if elm.distance == 'None':
+        elm.distance = None
+    if elm.firstname == 'None':
+        elm.firstname = None
+    if elm.lastname == 'None':
+        elm.lastname = None
+    if elm.username == 'None':
+        elm.username = None
+    if elm.phone == 'None':
+        elm.phone = None
 
 
 '''
@@ -312,14 +313,11 @@ A function that generate a pdf with the data obtained from the scan
 :return None
 '''
 
+
 def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended_report):
     global start_groups_table, start_user_table, elem_group_table, elem_user_table, end_table, global_template
 
-    if extended_report == 'True':
-        zoom = 14
-    else:
-        zoom = 15
-
+    zoom = 14 if extended_report == 'True' else 15
     with Progress() as progress:
         task3 = progress.add_task("[red] Generating report...", total=5)
         try:
@@ -329,7 +327,7 @@ def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended
             options.add_argument('--headless')
             options.add_argument('window-size=1920x1080')
             driver = webdriver.Chrome(service=service, options=options)
-        except:
+        except Exception:
             try:
                 service = EdgeService(EdgeChromiumDriverManager().install())
                 options = webdriver.EdgeOptions()
@@ -338,7 +336,7 @@ def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended
                 options.add_argument('--headless')
                 options.add_argument('window-size=1920x1080')
                 driver = webdriver.Edge(service=service, options=options)
-            except:
+            except Exception:
                 service = FirefoxService(GeckoDriverManager().install())
                 options = webdriver.FirefoxOptions()
                 options.add_argument('--headless')
@@ -472,8 +470,8 @@ def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended
         pdf = pisa.pisaDocument(BytesIO(template.encode("UTF-8")), result_file, encoding='UTF-8')
         progress.update(task3, advance=1)
 
-def generate_osintracker_investigation(users, groups, lat, lon, path, extended_report):
 
+def generate_osintracker_investigation(users, groups, lat, lon, path, extended_report):
     dexie = generate_empty_dexie_json()
 
     osintracker_investigation = fill_dexie_json(users, groups, f"{lat}, {lon}", dexie, extended_report)

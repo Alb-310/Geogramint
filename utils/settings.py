@@ -4,9 +4,9 @@ import os
 from kivy.uix.boxlayout import BoxLayout
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
-from kivymd.uix.textfield import MDTextField
-from kivymd.uix.selectioncontrol import MDSwitch
 from kivymd.uix.label.label import MDLabel
+from kivymd.uix.selectioncontrol import MDSwitch
+from kivymd.uix.textfield import MDTextField
 
 '''
 A function that load api_id, api_hash and phone number from config.ini
@@ -26,6 +26,7 @@ def loadConfig():
     phone_number = config.get('API', 'PHONE')
     extended_report = config.get('REPORT', 'EXTENDED')
     return api_id, api_hash, phone_number, extended_report
+
 
 '''
 A function that save api_id, api_hash and phone number in config.ini
@@ -50,6 +51,7 @@ def saveConfig(api_id, api_hash, phone_number, extended_report):
     with open('appfiles/config.ini', 'w') as configfile:
         config.write(configfile)
     return loadConfig()
+
 
 '''
 A function that return a dialog object to be displayed as settings menu
@@ -83,8 +85,8 @@ def settings_dialog(id, hash, number, extended_report):
     )
 
     checkbox = MDSwitch(
-        active=True if extended_report == "True" else False,
-        pos_hint={'center_x': .1, 'center_y': .1}
+        active=extended_report == "True",
+        pos_hint={'center_x': 0.1, 'center_y': 0.1},
     )
     phone_number.text = number
 
@@ -94,8 +96,6 @@ def settings_dialog(id, hash, number, extended_report):
     report_settings.add_widget(label)
     report_settings.add_widget(checkbox)
     content.add_widget(report_settings)
-
-
 
     save = MDFlatButton(
         text="SAVE",
