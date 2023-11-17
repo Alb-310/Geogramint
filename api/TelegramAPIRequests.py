@@ -44,12 +44,12 @@ def geolocate_AllEntities_Nearby(api_id, api_hash, phone_number, latitude, longi
                             code_dialog = False
                             connected = True
                             break
-                    except:  # if the password is wrong
+                    except Exception:
                         password = None
                         code = None
                         code_dialog = True
                         continue
-            except:  # if code is wrong
+            except Exception:
                 password = None
                 code = None
                 code_dialog = True

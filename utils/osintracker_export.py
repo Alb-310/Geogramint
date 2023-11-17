@@ -16,17 +16,11 @@ def generate_unique_uuid_string():
 
 def generate_unix_timestamp_milliseconds():
     now = datetime.datetime.now()
-    timestamp_milliseconds = int(now.timestamp() * 1000)
-    return timestamp_milliseconds
+    return int(now.timestamp() * 1000)
 
 
 def generate_empty_dexie_json():
-    data = {
-        "entities": [],
-        "relations": []
-    }
-
-    return data
+    return {"entities": [], "relations": []}
 
 
 def fill_dexie_json(users, groups, location, data, extended_report):
@@ -46,24 +40,26 @@ def fill_dexie_json(users, groups, location, data, extended_report):
         if extended_report == "False" and user.distance != "500" and user.distance != "1000" and user.distance != "2000":
             continue
         id = generate_unique_uuid_string()
-        if user.distance == "500":
-            color = "6"
-        elif user.distance == "1000":
+        if user.distance == "1000":
             color = "1"
         elif user.distance == "2000":
             color = "8"
+        elif user.distance == "500":
+            color = "6"
         else:
             color = "2"
-        data["entities"].append({
-            "comments": f"Telegram ID: {user.id}\nName: {user.firstname} {user.lastname if user.lastname is not None else ''}\nUsername:{user.username}\nPhone: {user.phone}",
-            "critical": False,
-            "typeId": "clh6s4hvvtyfk0buj91gibjf9",
-            "value": f"User: {user.username[1:-1] if user.username is not None else user.firstname[1:-1]}{' ' + user.lastname[1:-1] if user.username is None and user.lastname is not None else ''}",
-            "id": id,
-            "creationDate": creationdate,
-            "colorNum": f"{color}",
-            "editionDate": creationdate
-        })
+        data["entities"].append(
+            {
+                "comments": f"Telegram ID: {user.id}\nName: {user.firstname} {user.lastname if user.lastname is not None else ''}\nUsername:{user.username}\nPhone: {user.phone}",
+                "critical": False,
+                "typeId": "clh6s4hvvtyfk0buj91gibjf9",
+                "value": f"User: {user.username[1:-1] if user.username is not None else user.firstname[1:-1]}{f' {user.lastname[1:-1]}' if user.username is None and user.lastname is not None else ''}",
+                "id": id,
+                "creationDate": creationdate,
+                "colorNum": f"{color}",
+                "editionDate": creationdate,
+            }
+        )
 
         id_relation = generate_unique_uuid_string()
         data["relations"].append({
@@ -167,16 +163,18 @@ def fill_dexie_json(users, groups, location, data, extended_report):
         if user.firstname is not None:
             name_id = generate_unique_uuid_string()
             id_relation_name = generate_unique_uuid_string()
-            data["entities"].append({
-                "comments": f"{'Last Name Unknown' if user.lastname is None else ''}",
-                "critical": False,
-                "typeId": "clh6rcu0jtw4n0bujt1zdz84r",
-                "value": f"{user.firstname[1:-1]}{' ' + user.lastname[1:-1] if user.lastname is not None else ''}",
-                "id": name_id,
-                "creationDate": creationdate,
-                "colorNum": "4",
-                "editionDate": creationdate
-            })
+            data["entities"].append(
+                {
+                    "comments": f"{'Last Name Unknown' if user.lastname is None else ''}",
+                    "critical": False,
+                    "typeId": "clh6rcu0jtw4n0bujt1zdz84r",
+                    "value": f"{user.firstname[1:-1]}{f' {user.lastname[1:-1]}' if user.lastname is not None else ''}",
+                    "id": name_id,
+                    "creationDate": creationdate,
+                    "colorNum": "4",
+                    "editionDate": creationdate,
+                }
+            )
 
             data["relations"].append({
                 "bidirectional": False,

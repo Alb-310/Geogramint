@@ -1,9 +1,11 @@
 import json
+
 import requests
 
 """
 EXPERIMENTAL FEATURE
 """
+
 
 def process_users(json_filename, output_filename):
     with open(json_filename, "r", encoding="utf-8") as json_file:
@@ -56,9 +58,7 @@ def send_webhook_notification(webhook_url, message, files):
             response = requests.post(webhook_url, files=files)
         else:
             response = requests.post(webhook_url, json=payload)
-        if response.status_code == 200 or response.status_code == 204:
+        if response.status_code in {200, 204}:
             print("Webhook notification sent successfully.")
         else:
             print("Failed to send webhook notification.")
-
-

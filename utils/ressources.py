@@ -1,23 +1,24 @@
-import os
-import time
-import folium
 import codecs
 import json
-
-from kivy import Logger
-from utils import User
-from utils import Group
+import os
+import time
 from io import BytesIO
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.microsoft import EdgeChromiumDriverManager
-from webdriver_manager.firefox import GeckoDriverManager
+
+import folium
+from kivy import Logger
 from selenium import webdriver
-from xhtml2pdf import pisa, default
-from xhtml2pdf.default import DEFAULT_CSS
-from xhtml2pdf.files import pisaFileObject
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.edge.service import Service as EdgeService
 from selenium.webdriver.firefox.service import Service as FirefoxService
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
+from xhtml2pdf import pisa, default
+from xhtml2pdf.default import DEFAULT_CSS
+from xhtml2pdf.files import pisaFileObject
+
+from utils import Group
+from utils import User
 from utils.osintracker_export import generate_empty_dexie_json, fill_dexie_json
 
 '''
@@ -34,8 +35,7 @@ and isolate the Users
 def isolation_Users(res):
     usersStrtIndex = str.find(res, "users=[")
     usersEndIndex = str.find(res, "\n\t],", usersStrtIndex)
-    usersList = res[usersStrtIndex:usersEndIndex + len("\n\t]")]
-    return usersList
+    return res[usersStrtIndex:usersEndIndex + len("\n\t]")]
 
 
 '''
@@ -52,8 +52,7 @@ and isolate the Channels
 def isolation_Channels(res):
     channelsStrtIndex = str.find(res, "chats=[")
     channelsEndIndex = str.find(res, "\n\t],", channelsStrtIndex)
-    channelsList = res[channelsStrtIndex:channelsEndIndex + len("\n\t]")]
-    return channelsList
+    return res[channelsStrtIndex:channelsEndIndex + len("\n\t]")]
 
 
 '''
@@ -70,8 +69,7 @@ and isolate the Peers
 def isolation_Peers(res):
     peersStrtIndex = str.find(res, "peers=[")
     peersEndIndex = str.find(res, "\n\t],", peersStrtIndex)
-    peersList = res[peersStrtIndex:peersEndIndex + len("\n\t]")]
-    return peersList
+    return res[peersStrtIndex:peersEndIndex + len("\n\t]")]
 
 
 '''
@@ -155,20 +153,24 @@ def generate_ListOfUsers(usersList, peersList):
 
     # Cleaning attributes of User Object
     for elm in output:
-        if elm.id == 'None':
-            elm.id = None
-        if elm.distance == 'None':
-            elm.distance = None
-        if elm.firstname == 'None':
-            elm.firstname = None
-        if elm.lastname == 'None':
-            elm.lastname = None
-        if elm.username == 'None':
-            elm.username = None
-        if elm.phone == 'None':
-            elm.phone = None
-
+        _sanitize_user_attributes(elm)
     return output
+
+
+# TODO Rename this here and in `generate_ListOfUsers`
+def _sanitize_user_attributes(elm):
+    if elm.id == 'None':
+        elm.id = None
+    if elm.distance == 'None':
+        elm.distance = None
+    if elm.firstname == 'None':
+        elm.firstname = None
+    if elm.lastname == 'None':
+        elm.lastname = None
+    if elm.username == 'None':
+        elm.username = None
+    if elm.phone == 'None':
+        elm.phone = None
 
 
 '''
@@ -261,32 +263,16 @@ def download_allprofilespics(client, ListofUser, ListofGroup):
     for elm in ListofUser:
         if not elm.id.isnumeric():
             continue
-        client.download_profile_photo(int(elm.id), "cache_telegram/users/" + elm.id)
+        client.download_profile_photo(int(elm.id), f"cache_telegram/users/{elm.id}")
 
     # download of groups profile pics
     for elm in ListofGroup:
         if not elm.id.isnumeric():
             continue
-        client.download_profile_photo(int(elm.id), "cache_telegram/groups/" + elm.id)
+        client.download_profile_photo(int(elm.id), f"cache_telegram/groups/{elm.id}")
 
 
 def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended_report):
-    global_template = '''
-    <meta charset="UTF-8">
-    <pdf:language name="arabic"/>
-    <h1><img style="display: block; margin-left: auto; margin-right: auto; text-align: right;" src="appfiles/Geogramint.png"  width="75" height="75" /></h1>
-    <h4>&nbsp;</h4>
-    <p style="font-size: 16px;">{date}</p>
-    <p style="text-align: center; font-size: 25px;"><b>Geogramint Report:</b></p>
-    <p>&nbsp;</p>
-    <style>
-    {font}
-    </style>
-    <p><img style="display: block; margin-left: auto; margin-right: auto; text-align: center;" src="cache_telegram/reportfiles/map.png"  width="500" height="250" /></p>
-    <p style="text-align: center; font-size: 15px;"><i> {lat}, {lon} </i></p>
-    <p>&nbsp;</p>
-    '''
-
     start_user_table = '''
     <p style="font-size: 18px;">Users detected in the area:</p>
     <table style="height: 50px; width: 101.209%; border-collapse: collapse; text-align: center;" border="1">
@@ -350,10 +336,7 @@ def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended
     except OSError as error:
         print(error)
 
-    if extended_report == 'True':
-        zoom = 14
-    else:
-        zoom = 15
+    zoom = 14 if extended_report == 'True' else 15
     try:
         service = ChromeService(ChromeDriverManager().install())
         options = webdriver.ChromeOptions()
@@ -425,13 +408,32 @@ def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended
     driver.quit()
 
     distance = '<p style="font-size: 15px; color: {col};"><strong>{dist}m</strong></p>'
-    template = global_template.format(date=timestamp, lat=lat, lon=lon,
-                                      font=r"@font-face { font-family: 'test'; src: url("
-                                           r"'appfiles/DejaVuSans.ttf') } "
-                                           r"p { font-family: 'test' }")
-
-    template += start_user_table
-
+    global_template = '''
+    <meta charset="UTF-8">
+    <pdf:language name="arabic"/>
+    <h1><img style="display: block; margin-left: auto; margin-right: auto; text-align: right;" src="appfiles/Geogramint.png"  width="75" height="75" /></h1>
+    <h4>&nbsp;</h4>
+    <p style="font-size: 16px;">{date}</p>
+    <p style="text-align: center; font-size: 25px;"><b>Geogramint Report:</b></p>
+    <p>&nbsp;</p>
+    <style>
+    {font}
+    </style>
+    <p><img style="display: block; margin-left: auto; margin-right: auto; text-align: center;" src="cache_telegram/reportfiles/map.png"  width="500" height="250" /></p>
+    <p style="text-align: center; font-size: 15px;"><i> {lat}, {lon} </i></p>
+    <p>&nbsp;</p>
+    '''
+    template = (
+        global_template.format(
+            date=timestamp,
+            lat=lat,
+            lon=lon,
+            font=r"@font-face { font-family: 'test'; src: url("
+            r"'appfiles/DejaVuSans.ttf') } "
+            r"p { font-family: 'test' }",
+        )
+        + start_user_table
+    )
     for user in userlist:
         if user.distance == '500':
             col = '#5fff5f'
@@ -443,29 +445,23 @@ def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended
             col = '#d75f5f'
         else:
             continue
-        if len(user.firstname) <= 12:
-            size1 = '14'
-        else:
-            size1 = '11'
-        if user.lastname and len(user.lastname) <= 12:
-            size2 = '14'
-        else:
-            size2 = '11'
-        if user.username and len(user.username) <= 12:
-            size3 = '14'
-        else:
-            size3 = '11'
-        tmp = elem_user_table.format(image='cache_telegram/users/' + str(user.id) + ".jpg" if os.path.exists(
-            "cache_telegram/users/" + str(user.id) + ".jpg") else 'appfiles/placeholder.png',
-                                     id=str(user.id),
-                                     firstname=user.firstname[1:-1],
-                                     lastname=user.lastname[1:-1] if user.lastname is not None else "",
-                                     username=user.username[1:-1] if user.username is not None else "",
-                                     phone='+' + user.phone[1:-1] if user.phone is not None else "",
-                                     distance=distance.format(col=col, dist=user.distance),
-                                     size1=size1,
-                                     size2=size2,
-                                     size3=size3)
+        size1 = '14' if len(user.firstname) <= 12 else '11'
+        size2 = '14' if user.lastname and len(user.lastname) <= 12 else '11'
+        size3 = '14' if user.username and len(user.username) <= 12 else '11'
+        tmp = elem_user_table.format(
+            image=f'cache_telegram/users/{str(user.id)}.jpg'
+            if os.path.exists(f"cache_telegram/users/{str(user.id)}.jpg")
+            else 'appfiles/placeholder.png',
+            id=str(user.id),
+            firstname=user.firstname[1:-1],
+            lastname=user.lastname[1:-1] if user.lastname is not None else "",
+            username=user.username[1:-1] if user.username is not None else "",
+            phone=f'+{user.phone[1:-1]}' if user.phone is not None else "",
+            distance=distance.format(col=col, dist=user.distance),
+            size1=size1,
+            size2=size2,
+            size3=size3,
+        )
         template += tmp
     template += end_table
     template += start_groups_table
@@ -480,11 +476,14 @@ def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended
             col = '#d75f5f'
         else:
             continue
-        tmp = elem_group_table.format(image='cache_telegram/groups/' + str(group.id) + ".jpg" if os.path.exists(
-            "cache_telegram/groups/" + str(group.id) + ".jpg") else 'appfiles/placeholder.png',
-                                      id=str(group.id),
-                                      name=group.name[1:-1],
-                                      distance=distance.format(col=col, dist=group.distance))
+        tmp = elem_group_table.format(
+            image=f'cache_telegram/groups/{str(group.id)}.jpg'
+            if os.path.exists(f"cache_telegram/groups/{str(group.id)}.jpg")
+            else 'appfiles/placeholder.png',
+            id=str(group.id),
+            name=group.name[1:-1],
+            distance=distance.format(col=col, dist=group.distance),
+        )
         template += tmp
     template += end_table
     result_file = open(path, "w+b")
@@ -496,7 +495,6 @@ def generate_pdf_report(userlist, grouplist, lat, lon, timestamp, path, extended
 
 
 def generate_osintracker_investigation(users, groups, lat, lon, path, extended_report):
-
     dexie = generate_empty_dexie_json()
 
     osintracker_investigation = fill_dexie_json(users, groups, f"{lat}, {lon}", dexie,

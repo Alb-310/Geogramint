@@ -1,11 +1,12 @@
 # v1.4
-import os
-import sys
 import codecs
-import trio
-import shutil
 import json
+import os
+import shutil
+import sys
+
 import pandas as pd
+import trio
 
 if len(sys.argv) < 2:
     from kivy.uix.image import AsyncImage
@@ -80,7 +81,7 @@ def telegramAPICall():
         users, groups, timestamp = geolocate_AllEntities_Nearby(api_id, api_hash, phone_number, float(lat), float(lon))
     except Exception as e:
         error = True
-        Logger.info(f"Geogramint Search: Nothing Found")
+        Logger.info("Geogramint Search: Nothing Found")
         searchStarted = False
         return
     enabled = True
@@ -103,13 +104,13 @@ def startSearch(dt):
     if users is None and searchStarted == False \
             and api_id is not None and api_hash is not None and phone_number is not None:
         searchStarted = True
-        Logger.info(f"Geogramint Search: Searching ...")
+        Logger.info("Geogramint Search: Searching ...")
         App.get_running_app().root.ids.mapzone.add_widget(Loading)
         try:
             t = Thread(target=telegramAPICall)
             t.start()
-        except:
-            Logger.info(f"Geogramint Search: Nothing Found")
+        except Exception:
+            Logger.info("Geogramint Search: Nothing Found")
             App.get_running_app().root.ids.mapzone.add_widget(error_anim)
             Clock.schedule_once(remove_erroranim, error_anim.anim_delay * 50)
             searchStarted = False
@@ -193,14 +194,14 @@ def export_pdf_report(dt):
 
     if os.path.isdir(path):
         if path[-1] != '/':
-            path += 'Report_' + str(lat) + ',' + str(lon) + '.pdf'
+            path += f'Report_{str(lat)},{str(lon)}.pdf'
         else:
-            path += '/Report_' + str(lat) + ',' + str(lon) + '.pdf'
+            path += f'/Report_{str(lat)},{str(lon)}.pdf'
         try:
             t = Thread(target=ressources.generate_pdf_report, args=(users, groups, real_lat, real_lon, timestamp, path,
                                                                     extended_report))
             t.start()
-        except:
+        except Exception:
             Logger.info("Geogramint report: an error has occured during report creation")
     elif not os.path.isfile(path):
         if path[len(path) - 4:] != '.pdf':
@@ -209,10 +210,11 @@ def export_pdf_report(dt):
             t = Thread(target=ressources.generate_pdf_report, args=(users, groups, real_lat, real_lon, timestamp, path,
                                                                     extended_report))
             t.start()
-        except:
+        except Exception:
             Logger.info("Geogramint report: an error has occured during report creation")
     else:
         return
+
 
 def export_osintracker_investigation(dt):
     global timestamp, users, groups, extended_report, real_lat, real_lon
@@ -228,24 +230,27 @@ def export_osintracker_investigation(dt):
 
     if os.path.isdir(path):
         if path[-1] != '/':
-            path += 'Geogramint_' + str(lat) + ',' + str(lon) + '.json'
+            path += f'Geogramint_{str(lat)},{str(lon)}.json'
         else:
-            path += '/Geogramint_' + str(lat) + ',' + str(lon) + '.json'
+            path += f'/Geogramint_{str(lat)},{str(lon)}.json'
         try:
-            t = Thread(target=ressources.generate_osintracker_investigation, args=(users, groups, real_lat, real_lon, path, extended_report))
+            t = Thread(target=ressources.generate_osintracker_investigation,
+                       args=(users, groups, real_lat, real_lon, path, extended_report))
             t.start()
-        except:
+        except Exception:
             Logger.info("Osintracker Export: an error has occured during investigation creation")
     elif not os.path.isfile(path):
         if path[len(path) - 12:] != '.json':
             path += '.json'
         try:
-            t = Thread(target=ressources.generate_osintracker_investigation, args=(users, groups, real_lat, real_lon, path, extended_report))
+            t = Thread(target=ressources.generate_osintracker_investigation,
+                       args=(users, groups, real_lat, real_lon, path, extended_report))
             t.start()
-        except:
+        except Exception:
             Logger.info("Osintracker Export: an error has occured during investigation creation")
     else:
         return
+
 
 def background_loop(dt):
     """
@@ -255,44 +260,7 @@ def background_loop(dt):
     lat = App.get_running_app().root.ids.mapview.ids.mark.lat
     lon = App.get_running_app().root.ids.mapview.ids.mark.lon
     if users is not None and enabled:
-        App.get_running_app().root.ids.mapzone.remove_widget(Loading)
-        App.get_running_app().root.ids.mapzone.add_widget(success_anim)
-        export_report = MDRaisedButton(
-            id="export",
-            text="[b]Export PDF[/b]",
-            md_bg_color=(1, 0.52, 0, 0.9),
-            pos_hint={'center_y': 0.05, 'center_x': 0.15}
-        )
-        export_osintracker = MDIconButton(
-            id="osintracker",
-            text=" ",
-            pos_hint={'center_y': 0.05, 'center_x': 0.3},
-            icon='appfiles/osintracker.png',
-            icon_size="35sp"
-        )
-
-        export_report.bind(on_press=export_pdf_report)
-        export_osintracker.bind(on_press=export_osintracker_investigation)
-        App.get_running_app().root.ids.mapzone.add_widget(export_report)
-        App.get_running_app().root.ids.mapzone.add_widget(export_osintracker)
-        Clock.schedule_once(remove_successanim, success_anim.anim_delay * 100)
-        for user in users:
-            name = ""
-            if user.firstname is not None:
-                name += user.firstname + " "
-            if user.lastname is not None:
-                name += user.lastname
-            resultDisplay.UserList().add_elm(user.id, name, user.username, user.distance)
-        groups.sort(key=lambda x: x.distance, reverse=False)
-        for group in groups:
-            resultDisplay.GroupList().add_elm(group.id, group.name, group.distance)
-
-        resultDisplay.GroupList().add_empty()
-        resultDisplay.GroupList().add_empty()
-        resultDisplay.UserList().add_empty()
-        resultDisplay.UserList().add_empty()
-        enabled = False
-
+        _update_interface_and_export_options(Loading, users)
     if TelegramAPIRequests.code_dialog is True and TelegramAPIRequests.connected is False:
         TelegramAPIRequests.code = None
         telegramCodeDialog().open()
@@ -304,6 +272,46 @@ def background_loop(dt):
         App.get_running_app().root.ids.mapzone.add_widget(error_anim)
         Clock.schedule_once(remove_erroranim, error_anim.anim_delay * 50)
         error = False
+
+
+def _update_interface_and_export_options(Loading, users):
+    App.get_running_app().root.ids.mapzone.remove_widget(Loading)
+    App.get_running_app().root.ids.mapzone.add_widget(success_anim)
+    export_report = MDRaisedButton(
+        id="export",
+        text="[b]Export PDF[/b]",
+        md_bg_color=(1, 0.52, 0, 0.9),
+        pos_hint={'center_y': 0.05, 'center_x': 0.15}
+    )
+    export_osintracker = MDIconButton(
+        id="osintracker",
+        text=" ",
+        pos_hint={'center_y': 0.05, 'center_x': 0.3},
+        icon='appfiles/osintracker.png',
+        icon_size="35sp"
+    )
+
+    export_report.bind(on_press=export_pdf_report)
+    export_osintracker.bind(on_press=export_osintracker_investigation)
+    App.get_running_app().root.ids.mapzone.add_widget(export_report)
+    App.get_running_app().root.ids.mapzone.add_widget(export_osintracker)
+    Clock.schedule_once(remove_successanim, success_anim.anim_delay * 100)
+    for user in users:
+        name = ""
+        if user.firstname is not None:
+            name += user.firstname + " "
+        if user.lastname is not None:
+            name += user.lastname
+        resultDisplay.UserList().add_elm(user.id, name, user.username, user.distance)
+    groups.sort(key=lambda x: x.distance, reverse=False)
+    for group in groups:
+        resultDisplay.GroupList().add_elm(group.id, group.name, group.distance)
+
+    resultDisplay.GroupList().add_empty()
+    resultDisplay.GroupList().add_empty()
+    resultDisplay.UserList().add_empty()
+    resultDisplay.UserList().add_empty()
+    enabled = False
 
 
 def search_location(dt):
@@ -322,7 +330,7 @@ def search_location(dt):
         App.get_running_app().root.ids.mapview.center_on(numlat, numlong)
 
         App.get_running_app().root.ids.searchInput.error = False
-    except:
+    except Exception:
         try:
             lat, long = str.split(' ')
             if lat.count('.') > 1 or long.count('.') > 1:
@@ -332,7 +340,7 @@ def search_location(dt):
             App.get_running_app().root.ids.mapview.center_on(numlat, numlong)
 
             App.get_running_app().root.ids.searchInput.error = False
-        except:
+        except Exception:
             App.get_running_app().root.ids.searchInput.error = True
             return
 
