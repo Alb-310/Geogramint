@@ -14,3 +14,4 @@ rich==13.5.2
 selenium==4.11.2
 webdriver-manager==4.0.0
 plyer==2.1.0
+telethon==1.35.0
