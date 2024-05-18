@@ -2,7 +2,7 @@ requests
 xhtml2pdf==0.2.11
 folium==0.14.0
 pandas==2.0.3
-telethon==1.29.2
+telethon==1.35.0
 trio==0.22.2
 kivy==2.2.1
 kivymd==1.1.1
