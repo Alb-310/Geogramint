@@ -1,4 +1,5 @@
 requests
+numpy==1.26.4
 xhtml2pdf==0.2.11
 folium==0.14.0
 pandas==2.0.3
