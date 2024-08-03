@@ -18,7 +18,7 @@ The tool is fully supported on Windows and partially supported on Mac OS and Lin
 
 ## 🛠️ Installation
 
-**Requirements:** [Python 3.8 or 3.9](https://www.python.org/downloads/release/python-3913/)<br>
+**Requirements:** [Python 3.9, 3.10 or 3.11](https://www.python.org/downloads/release/python-3112/)<br>
 
 ### On Windows [![Windows](https://img.shields.io/badge/Windows-03b1fc?style=for-the-badge&logo=windows)](https://svgshare.com/i/ZhY.svg)
 
